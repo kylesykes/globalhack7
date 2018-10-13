@@ -19,6 +19,7 @@ const expressValidator = require("express-validator");
 const expressStatusMonitor = require("express-status-monitor");
 const sass = require("node-sass-middleware");
 const multer = require("multer");
+const cors = require("cors");
 
 const upload = multer({ dest: path.join(__dirname, "uploads") });
 
@@ -56,8 +57,7 @@ mongoose.connect(process.env.MONGODB_URI);
 mongoose.connection.on("error", err => {
   console.error(err);
   console.log(
-    "%s MongoDB connection error. Please make sure MongoDB is running.",
-    chalk.red("✗")
+    "%s MongoDB connection error. Please make sure MongoDB is running."
   );
   process.exit();
 });
@@ -69,6 +69,7 @@ app.set("host", process.env.OPENSHIFT_NODEJS_IP || "0.0.0.0");
 app.set("port", process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "pug");
+app.use(cors());
 app.use(expressStatusMonitor());
 app.use(compression());
 app.use(
@@ -96,13 +97,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-app.use((req, res, next) => {
-  if (req.path === "/api/upload") {
-    next();
-  } else {
-    lusca.csrf()(req, res, next);
-  }
-});
 app.use(lusca.xframe("SAMEORIGIN"));
 app.use(lusca.xssProtection(true));
 app.disable("x-powered-by");

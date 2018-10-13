@@ -1,5 +1,6 @@
 import random
 
+from bson.objectid import ObjectId
 import faker
 
 
@@ -13,7 +14,7 @@ def generate_ts():
 
 
 def generate_id(n=24):
-    return fake.pystr(min_chars=n, max_chars=n)
+    return str(ObjectId())
 
 
 def generate_phone():
@@ -105,7 +106,7 @@ def generate_data():
          '_id': generate_id(),
          'createdAt': generate_ts(),
          'mentees': [],
-         'mentors': [generate_ts()],
+         'mentors': [generate_id()],
          'milestones': generate_milestones(),
          'phone': generate_phone(),
          'profile': {'age': random.randint(18, 70),
