@@ -119,6 +119,29 @@ exports.postSignup = (req, res, next) => {
   });
 };
 
+exports.assignMilestone = (req, res) => {
+  let userId = req.body.id;
+  let milestoneTemplateId = req.body.id;
+
+  User.User.findById(userId, (err, user) => {
+    if (err) {
+      return next(err);
+    }
+    console.log(user);
+    MilestoneTemplate.findById(
+      milestoneTemplateId,
+      (err, milestoneTemplate) => {
+        if (err) {
+          return next(err);
+        }
+        user.milestones.push(milestoneTemplate);
+        user.save();
+        res.send({});
+      }
+    );
+  });
+};
+
 /**
  * ***********************************************************
  * ********************* UNUSED ******************************
