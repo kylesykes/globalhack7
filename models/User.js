@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
-const MilestoneBaseSchema = require("MilestoneBaseSchema");
-
-milestoneFromTemplate(milestoneTemplate => {
-  return milestoneTemplate;
-});
+const MilestoneBaseSchema = require("./MilestoneTemplate");
 
 const ObjectId = mongoose.Schema.Types.ObjectId;
 

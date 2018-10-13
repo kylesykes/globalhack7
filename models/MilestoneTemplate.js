@@ -1,23 +1,19 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose"),
+  extend = require("mongoose-schema-extend");
+const util = require("util");
+var Schema = mongoose.Schema;
 
-function MilestoneBaseSchema() {
-  Schema.apply(this, arguments);
-
-  this.add(
-    {
-      name: { type: String, unique: true },
-      description: String,
-      steps: {
-        name: String,
-        description: String
-      }
-    },
-    { timestamps: true }
-  );
-}
-util.inherits(BaseSchema, Schema);
-
-const milestoneTemplateSchema = new MilestoneBaseSchema();
+const milestoneTemplateSchema = new mongoose.Schema(
+  {
+    name: { type: String, unique: true },
+    description: String,
+    steps: {
+      name: String,
+      description: String
+    }
+  },
+  { timestamps: true }
+);
 
 const MilestoneTemplate = mongoose.model(
   "MilestoneTemplate",
