@@ -12,7 +12,7 @@ mongoose
   .connect(mongo)
   .then(() => {
     for (let i = 0; i < users.length; i++) {
-      User.create(users[i]).catch(err => {
+      User.User.create(users[i]).catch(err => {
         console.log(err);
       });
     }
