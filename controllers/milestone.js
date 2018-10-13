@@ -1,4 +1,4 @@
-const MilestoneTemplate = require("../models/milestone");
+const MilestoneTemplate = require("../models/MilestoneTemplate");
 
 exports.getMilestones = (req, res, next) => {
   MilestoneTemplate.find({}, (err, milestones) => {
