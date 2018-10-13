@@ -11,7 +11,6 @@ const { Strategy: OpenIDStrategy } = require("passport-openid");
 const { OAuthStrategy } = require("passport-oauth");
 const { OAuth2Strategy } = require("passport-oauth");
 const getPhone = require("./get_phone");
-
 const User = require("../models/User");
 
 passport.serializeUser((user, done) => {
@@ -38,7 +37,7 @@ passport.use(
         return done(err);
       }
       if (!user) {
-        return done(null, false, { msg: `Phone ${parsedPhone} not found.` });
+        return done(null, false, { msg: `Phone ${phone} not found.` });
       }
       user.comparePassword(password, (err, isMatch) => {
         if (err) {
