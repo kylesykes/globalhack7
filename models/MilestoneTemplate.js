@@ -1,7 +1,4 @@
-const mongoose = require("mongoose"),
-  extend = require("mongoose-schema-extend");
-const util = require("util");
-var Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
 const milestoneTemplateSchema = new mongoose.Schema(
   {
@@ -20,5 +17,4 @@ const MilestoneTemplate = mongoose.model(
   milestoneTemplateSchema
 );
 
-module.exports.MilestoneBaseSchema = MilestoneBaseSchema;
-module.exports.MilestoneTemplate = MilestoneTemplate;
+module.exports = MilestoneTemplate;

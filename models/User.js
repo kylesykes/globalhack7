@@ -1,20 +1,18 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
-const MilestoneBaseSchema = require("./MilestoneTemplate");
 
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
-const milestoneSchema = new MilestoneBaseSchema({
+const milestoneSchema = new mongoose.Schema({
+  templateId: String,
+  name: String,
+  description: String,
   steps: [
     {
-      in_progress: {
-        type: Boolean,
-        default: false
-      },
-      complete: {
-        type: Boolean,
-        default: false
-      }
+      name: String,
+      description: String,
+      in_progress: Boolean,
+      complete: Boolean
     }
   ]
 });
@@ -74,7 +72,6 @@ userSchema.methods.comparePassword = function comparePassword(
 const User = mongoose.model("User", userSchema);
 
 module.exports.User = User;
-module.exports.milestoneFromTemplate = milestoneFromTemplate;
 module.exports.isMentee = user => {
   return user && user.mentors && user.mentors.length > 0;
 };
