@@ -1,32 +1,27 @@
 const mongoose = require("mongoose");
+const fs = require("fs");
 const User = require("../models/User");
-const Messages = require("../models/Messages");
-const MilestoneTemplates = require("../MilestoneTemplates");
+const dotenv = require("dotenv");
+dotenv.load({ path: ".env.example" });
 
-let mileStoneObject = {
-  templateId: "5",
-  name: "Drivesr License",
-  description: "To the DMV and get a drivers license",
-  steps: []
-};
+const mongo = process.env.MONGODB_URI;
+console.log(mongo);
 
-let userObject = {
-  username: "farrellw",
-  phone: "5632107275",
-  mentors: [],
-  mentees: [],
-  milestones: [mileStoneObject],
-  profile: {}
-};
+const users = JSON.parse(fs.readFileSync("seed/users.json", "utf8"));
+mongoose
+  .connect(mongo)
+  .then(() => {
+    for (let i = 0; i < users.length; i++) {
+      User.create(users[i]).catch(err => {
+        console.log(err);
+      });
+    }
+  })
+  .catch(err => {
+    console.log(err);
+    process.exit();
+  });
 
-let myUser = new User(userObject);
-
-mongoose.set("useFindAndModify", false);
-mongoose.set("useCreateIndex", true);
-mongoose.set("useNewUrlParser", true);
-const localMongo = "mongodb://localhost:27017/practice";
-console.log("MONGODBURL", localMongo);
-mongoose.connect(localMongo);
 mongoose.connection.on("error", err => {
   console.error(err);
   console.log(
