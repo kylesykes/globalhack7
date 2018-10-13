@@ -70,8 +70,9 @@ exports.postLogin = (req, res, next) => {
         if (err) {
           return next(err);
         }
-        req.flash("success", { msg: "Success! You are logged in." });
-        res.redirect(req.session.returnTo || "/");
+
+        delete user.password;
+        res.send(user);
       });
   })(req, res, next);
 };
@@ -106,7 +107,7 @@ exports.postSignup = (req, res, next) => {
       req.flash("errors", {
         msg: "Account with that phone already exists."
       });
-      return res.redirect("/signup");
+      return res.send({ error: "User Already Exists" });
     }
     user.save(err => {
       if (err) {
@@ -116,7 +117,9 @@ exports.postSignup = (req, res, next) => {
         if (err) {
           return next(err);
         }
-        res.redirect("/");
+
+        delete user.password;
+        res.send(user);
       });
     });
   });
