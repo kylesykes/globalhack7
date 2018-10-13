@@ -130,12 +130,17 @@ exports.assignMilestone = (req, res) => {
     if (err) {
       return next(err);
     }
-    console.log(user);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
     MilestoneTemplate.findById(
       milestoneTemplateId,
       (err, milestoneTemplate) => {
         if (err) {
           return next(err);
+        }
+        if (!milestoneTemplate) {
+          return res.status(404).send("MilestoneTemplateNotFound");
         }
         user.milestones.push(milestoneTemplate);
         user.save();
