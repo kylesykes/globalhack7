@@ -11,6 +11,9 @@ exports.getUser = (req, res, next) => {
     if (err) {
       return next(err);
     }
+    if (!existingUser) {
+      return res.send({});
+    }
     let response;
     if (User.isMentee(existingUser)) {
       let mentor = existingUser.mentors[0];
