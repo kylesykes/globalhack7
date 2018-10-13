@@ -155,11 +155,7 @@ app.use(
 /**
  * Primary app routes.
  */
-app.get(
-  "/api/users/:phone",
-  userController.getUser,
-  passportConfig.isAuthenticated
-);
+app.get("/api/users/:phone", userController.getUser);
 app.post("/api/login", userController.postLogin);
 app.post("/api/signup", userController.postSignup);
 app.get("/api/milestones", milestoneController.getMilestones);
