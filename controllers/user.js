@@ -6,7 +6,7 @@ const User = require("../models/User");
 const getPhone = require("../config/strip_phone");
 const randomBytesAsync = promisify(crypto.randomBytes);
 
-exports.getUser = (req, res) => {
+exports.getUser = (req, res, next) => {
   User.User.findOne({ phone: req.params.phone }, (err, existingUser) => {
     if (err) {
       return next(err);
