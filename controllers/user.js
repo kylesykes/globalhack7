@@ -12,7 +12,7 @@ exports.getUser = (req, res, next) => {
       return next(err);
     }
     if (!existingUser) {
-      return res.send({});
+      return res.status(404).send("Not found");
     }
     let response;
     if (User.isMentee(existingUser)) {
