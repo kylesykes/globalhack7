@@ -36,7 +36,7 @@ def generate_un():
 # #### Genereate objects
 
 milestones_list = {'drivers_license':
-                    {'desc': 'To the DMV and get a drivers license',
+                    {'description': 'To the DMV and get a drivers license',
                      'name': 'Driver\'s License',
                      'ms_id': 1,
                      'steps': [('Step One', 'The First Step'),
@@ -45,7 +45,7 @@ milestones_list = {'drivers_license':
                                ('Step Four', 'The Fourth Step')]
                     },
                 'apply_for_loan':
-                    {'desc': 'Apply for a loan',
+                    {'description': 'Apply for a loan',
                      'name': 'Loan',
                      'ms_id': 2,
                      'steps': [('Step One', 'The First Step'),
@@ -54,7 +54,7 @@ milestones_list = {'drivers_license':
                                ('Step Four', 'The Fourth Step')]
                     },
                 'get_license':
-                    {'desc': 'Get commerical license',
+                    {'description': 'Get commerical license',
                      'name': 'Get license',
                      'ms_id': 3,
                      'steps': [('Step One', 'The First Step'),
@@ -63,7 +63,7 @@ milestones_list = {'drivers_license':
                                ('Step Four', 'The Fourth Step')]
                     },
                 'apply_for_permit':
-                    {'desc': 'Apply for a permit',
+                    {'description': 'Apply for a permit',
                      'name': 'Permit',
                      'ms_id': 4,
                      'steps': [('Step One', 'The First Step'),
@@ -72,7 +72,7 @@ milestones_list = {'drivers_license':
                                ('Step Four', 'The Fourth Step')]
                     },
                 'find_a_store':
-                    {'desc': 'Find a store',
+                    {'description': 'Find a store',
                      'name': 'Store',
                      'ms_id': 5,
                      'steps': [('Step One', 'The First Step'),
@@ -81,7 +81,7 @@ milestones_list = {'drivers_license':
                                ('Step Four', 'The Fourth Step')]
                     },
                 'financial_basics':
-                    {'desc': 'Learn about financial basics',
+                    {'description': 'Learn about financial basics',
                      'name': 'Financial basics',
                      'ms_id': 6,
                      'steps': [('Step One', 'The First Step'),
@@ -94,12 +94,12 @@ milestones_list = {'drivers_license':
 
 goals_list = {'start_business': {'g_id': 1,
                             'name': 'Start a business',
-                            'desc': 'Start a your own business.',
+                            'description': 'Start a your own business.',
                             'milestones': [2, 3, 4, 5, 6]
                             },
          'another_goal': {'g_id': 2,
                           'name': 'Another goal.',
-                          'desc': 'This is another goal',
+                          'description': 'This is another goal',
                           'milestones': [1, 6]
                           }
         }
@@ -147,7 +147,7 @@ def generate_milestone(milestone):
     ms = milestones_list[milestone]
     n_steps = random.randint(1, 4)
     r = {'_id': generate_id(),
-         'description': ms['desc'],
+         'description': ms['description'],
          'name': ms['name'],
          'steps': generate_steps(milestone=milestone, n_steps=n_steps)}
     return r
@@ -159,7 +159,9 @@ def generate_milestones(n=None, max_n=3, milestones=None):
     return [generate_milestone(ms) for ms in random.choices(list(milestones_list.keys()), k=n)]
 
 
-def generate_data():
+### API
+
+def generate_user():
     return {'__v': 1,
          '_id': generate_id(),
          'createdAt': generate_ts(),
@@ -176,10 +178,30 @@ def generate_data():
          'password': 'password'}
 
 
+def get_goals():
+    goals = []
+    for g in goals_list.values():
+        temp = dict(g)
+        temp['_id'] = generate_id()
+        goals.append(temp)
+    return goals
+
+
+def get_milestones():
+    ms = []
+    for m in milestones_list.values():
+        temp = dict(m)
+        temp['_id'] = generate_id()
+        ms.append(temp)
+    return ms
+    
+
+### Main
+
 if __name__=='__main__':
     import sys
     import json
     num = sys.argv[1]
-    data = [generate_data() for _ in range(int(num))]
+    data = [generate_user() for _ in range(int(num))]
     data[0]['phone'] = '3141111111'
     json.dump(data, open('users.json', 'w'))
