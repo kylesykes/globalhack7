@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const passport = require("passport");
 const User = require("../models/User");
+const getPhone = require("../config/get_phone");
 const randomBytesAsync = promisify(crypto.randomBytes);
 
 exports.getUser = (req, res) => {
@@ -13,7 +14,6 @@ exports.getUser = (req, res) => {
     let response;
     if (User.isMentee(existingUser)) {
       let mentor = existingUser.mentors[0];
-      console.log(mentor);
 
       User.User.findOne({ _id: mentor }, (err, mentor) => {
         if (err) {
@@ -25,7 +25,6 @@ exports.getUser = (req, res) => {
       });
     } else {
       let mentee = existingUser.mentees[0];
-      console.log(mentee);
 
       User.User.findOne({ _id: mentee }, (err, mentee) => {
         if (err) {
@@ -119,7 +118,7 @@ exports.getSignup = (req, res) => {
  * Create a new local account.
  */
 exports.postSignup = (req, res, next) => {
-  req.assert("email", "Email is not valid").isEmail();
+  req.assert("phone", "Phone is not valid").isMobilePhone();
   req.assert("password", "Password must be at least 4 characters long").len(4);
   req
     .assert("confirmPassword", "Passwords do not match")
@@ -132,6 +131,11 @@ exports.postSignup = (req, res, next) => {
     return res.redirect("/signup");
   }
 
+  let match = getPhone(req.body.phone);
+  if (!match) {
+    return res.redirect("/signup");
+  }
+  req.body.phone = match[0];
   const user = new User.User(req.body);
 
   User.User.findOne({ phone: req.body.phone }, (err, existingUser) => {
@@ -174,7 +178,6 @@ exports.getAccount = (req, res) => {
  */
 exports.postUpdateProfile = (req, res, next) => {
   req.assert("phone", "Please enter a valid phone.").isMobilePhone();
-  // req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
 
   const errors = req.validationErrors();
 

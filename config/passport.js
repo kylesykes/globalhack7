@@ -10,6 +10,7 @@ const { Strategy: LinkedInStrategy } = require("passport-linkedin-oauth2");
 const { Strategy: OpenIDStrategy } = require("passport-openid");
 const { OAuthStrategy } = require("passport-oauth");
 const { OAuth2Strategy } = require("passport-oauth");
+const getPhone = require("./get_phone");
 
 const User = require("../models/User");
 
@@ -28,12 +29,16 @@ passport.deserializeUser((id, done) => {
  */
 passport.use(
   new LocalStrategy({ usernameField: "phone" }, (phone, password, done) => {
-    User.User.findOne({ phone: phone.toLowerCase() }, (err, user) => {
+    const match = getPhone(phone);
+    if (!match) {
+      return done(null, false, { msg: "Invalid Phone Number Entered" });
+    }
+    User.User.findOne({ phone: match[0] }, (err, user) => {
       if (err) {
         return done(err);
       }
       if (!user) {
-        return done(null, false, { msg: `Phone ${phone} not found.` });
+        return done(null, false, { msg: `Phone ${parsedPhone} not found.` });
       }
       user.comparePassword(password, (err, isMatch) => {
         if (err) {
