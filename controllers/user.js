@@ -107,7 +107,7 @@ exports.postSignup = (req, res, next) => {
       req.flash("errors", {
         msg: "Account with that phone already exists."
       });
-      return res.redirect("/signup");
+      return res.send({ error: "User Already Exists" });
     }
     user.save(err => {
       if (err) {
