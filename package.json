@@ -12,7 +12,8 @@
     "postinstall": "npm rebuild node-sass",
     "start": "node app.js",
     "test": "nyc mocha --timeout=10000 --exit",
-    "lint": "eslint \"**/*.js\""
+    "lint": "eslint \"**/*.js\"",
+    "seed": "node seed/seeder.js"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.3.1",
