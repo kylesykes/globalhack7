@@ -1,14 +1,20 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const milestoneTemplateSchema = new mongoose.Schema({
-  name: { type: String, unique: true },
-  description: String,
-  steps: {
-    name: String,
+const milestoneTemplateSchema = new mongoose.Schema(
+  {
+    name: { type: String, unique: true },
     description: String,
-  }
-}, { timestamps: true });
+    steps: {
+      name: String,
+      description: String
+    }
+  },
+  { timestamps: true }
+);
 
-const MilestoneTemplate = mongoose.model('MilestoneTemplate', milestoneTemplateSchema);
+const MilestoneTemplate = mongoose.model(
+  "MilestoneTemplate",
+  milestoneTemplateSchema
+);
 
 module.exports = MilestoneTemplate;

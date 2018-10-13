@@ -5,7 +5,6 @@ const dotenv = require("dotenv");
 dotenv.load({ path: ".env.example" });
 
 const mongo = process.env.MONGODB_URI;
-console.log(mongo);
 
 const users = JSON.parse(fs.readFileSync("seed/users.json", "utf8"));
 mongoose
@@ -25,8 +24,7 @@ mongoose
 mongoose.connection.on("error", err => {
   console.error(err);
   console.log(
-    "%s MongoDB connection error. Please make sure MongoDB is running.",
-    chalk.red("✗")
+    "%s MongoDB connection error. Please make sure MongoDB is running."
   );
   process.exit();
 });

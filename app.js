@@ -35,6 +35,7 @@ const homeController = require("./controllers/home");
 const userController = require("./controllers/user");
 const apiController = require("./controllers/api");
 const contactController = require("./controllers/contact");
+const milestoneController = require("./controllers/milestone");
 
 /**
  * API keys and Passport configuration.
@@ -155,10 +156,12 @@ app.use(
  * Primary app routes.
  */
 app.get("/api/users/:phone", userController.getUser);
+app.post("/api/login", userController.postLogin);
+app.post("/api/signup", userController.postSignup);
+app.get("/api/milestones", milestoneController.getMilestones);
+
 app.get("/", homeController.index);
 app.get("/login", userController.getLogin);
-app.post("/login", userController.postLogin);
-app.post("/signup", userController.postSignup);
 app.get("/logout", userController.logout);
 app.get("/forgot", userController.getForgot);
 app.post("/forgot", userController.postForgot);

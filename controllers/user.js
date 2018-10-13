@@ -6,10 +6,13 @@ const User = require("../models/User");
 const getPhone = require("../config/strip_phone");
 const randomBytesAsync = promisify(crypto.randomBytes);
 
-exports.getUser = (req, res) => {
+exports.getUser = (req, res, next) => {
   User.User.findOne({ phone: req.params.phone }, (err, existingUser) => {
     if (err) {
       return next(err);
+    }
+    if (!existingUser) {
+      return res.status(404).send("Not found");
     }
     let response;
     if (User.isMentee(existingUser)) {
@@ -35,19 +38,6 @@ exports.getUser = (req, res) => {
         res.send(response);
       });
     }
-  });
-};
-
-/**
- * GET /login
- * Login page.
- */
-exports.getLogin = (req, res) => {
-  if (req.user) {
-    return res.redirect("/");
-  }
-  res.render("account/login", {
-    title: "Login"
   });
 };
 
@@ -84,33 +74,6 @@ exports.postLogin = (req, res, next) => {
         res.redirect(req.session.returnTo || "/");
       });
   })(req, res, next);
-};
-
-/**
- * GET /logout
- * Log out.
- */
-exports.logout = (req, res) => {
-  req.logout();
-  req.session.destroy(err => {
-    if (err)
-      console.log("Error : Failed to destroy the session during logout.", err);
-    req.user = null;
-    res.redirect("/");
-  });
-};
-
-/**
- * GET /signup
- * Signup page.
- */
-exports.getSignup = (req, res) => {
-  if (req.user) {
-    return res.redirect("/");
-  }
-  res.render("account/signup", {
-    title: "Create Account"
-  });
 };
 
 /**
@@ -156,6 +119,79 @@ exports.postSignup = (req, res, next) => {
         res.redirect("/");
       });
     });
+  });
+};
+
+exports.assignMilestone = (req, res) => {
+  let userId = req.body.id;
+  let milestoneTemplateId = req.body.id;
+
+  User.User.findById(userId, (err, user) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    MilestoneTemplate.findById(
+      milestoneTemplateId,
+      (err, milestoneTemplate) => {
+        if (err) {
+          return next(err);
+        }
+        if (!milestoneTemplate) {
+          return res.status(404).send("MilestoneTemplateNotFound");
+        }
+        user.milestones.push(milestoneTemplate);
+        user.save();
+        res.send({});
+      }
+    );
+  });
+};
+
+/**
+ * ***********************************************************
+ * ********************* UNUSED ******************************
+ */
+
+/**
+ * GET /login
+ * Login page.
+ */
+exports.getLogin = (req, res) => {
+  if (req.user) {
+    return res.redirect("/");
+  }
+  res.render("account/login", {
+    title: "Login"
+  });
+};
+
+/**
+ * GET /logout
+ * Log out.
+ */
+exports.logout = (req, res) => {
+  req.logout();
+  req.session.destroy(err => {
+    if (err)
+      console.log("Error : Failed to destroy the session during logout.", err);
+    req.user = null;
+    res.redirect("/");
+  });
+};
+
+/**
+ * GET /signup
+ * Signup page.
+ */
+exports.getSignup = (req, res) => {
+  if (req.user) {
+    return res.redirect("/");
+  }
+  res.render("account/signup", {
+    title: "Create Account"
   });
 };
 

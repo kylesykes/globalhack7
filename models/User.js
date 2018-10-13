@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
-const crypto = require("crypto");
 
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
@@ -72,7 +71,7 @@ userSchema.methods.comparePassword = function comparePassword(
 
 const User = mongoose.model("User", userSchema);
 
+module.exports.User = User;
 module.exports.isMentee = user => {
   return user && user.mentors && user.mentors.length > 0;
 };
-module.exports.User = User;
