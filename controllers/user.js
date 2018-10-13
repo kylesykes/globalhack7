@@ -3,7 +3,6 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const passport = require("passport");
 const User = require("../models/User");
-
 const randomBytesAsync = promisify(crypto.randomBytes);
 
 exports.getUser = (req, res) => {
@@ -58,9 +57,8 @@ exports.getLogin = (req, res) => {
  * Sign in using email and password.
  */
 exports.postLogin = (req, res, next) => {
-  req.assert("email", "Email is not valid").isEmail();
+  req.assert("phone", "Phone is not valid").isMobilePhone();
   req.assert("password", "Password cannot be blank").notEmpty();
-  req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
 
   const errors = req.validationErrors();
 
@@ -71,19 +69,21 @@ exports.postLogin = (req, res, next) => {
 
   passport.authenticate("local", (err, user, info) => {
     if (err) {
+      req.flash("errors", info);
       return next(err);
     }
     if (!user) {
       req.flash("errors", info);
       return res.redirect("/login");
     }
-    req.logIn(user, err => {
-      if (err) {
-        return next(err);
-      }
-      req.flash("success", { msg: "Success! You are logged in." });
-      res.redirect(req.session.returnTo || "/");
-    });
+    if (user.password)
+      req.logIn(user, err => {
+        if (err) {
+          return next(err);
+        }
+        req.flash("success", { msg: "Success! You are logged in." });
+        res.redirect(req.session.returnTo || "/");
+      });
   })(req, res, next);
 };
 
@@ -124,7 +124,6 @@ exports.postSignup = (req, res, next) => {
   req
     .assert("confirmPassword", "Passwords do not match")
     .equals(req.body.password);
-  req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
 
   const errors = req.validationErrors();
 
@@ -133,18 +132,15 @@ exports.postSignup = (req, res, next) => {
     return res.redirect("/signup");
   }
 
-  const user = new User.User({
-    email: req.body.email,
-    password: req.body.password
-  });
+  const user = new User.User(req.body);
 
-  User.User.findOne({ email: req.body.email }, (err, existingUser) => {
+  User.User.findOne({ phone: req.body.phone }, (err, existingUser) => {
     if (err) {
       return next(err);
     }
     if (existingUser) {
       req.flash("errors", {
-        msg: "Account with that email address already exists."
+        msg: "Account with that phone already exists."
       });
       return res.redirect("/signup");
     }
@@ -177,8 +173,8 @@ exports.getAccount = (req, res) => {
  * Update profile information.
  */
 exports.postUpdateProfile = (req, res, next) => {
-  req.assert("email", "Please enter a valid email address.").isEmail();
-  req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
+  req.assert("phone", "Please enter a valid phone.").isMobilePhone();
+  // req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
 
   const errors = req.validationErrors();
 
@@ -436,8 +432,7 @@ exports.getForgot = (req, res) => {
  * Create a random token, then the send user an email with a reset link.
  */
 exports.postForgot = (req, res, next) => {
-  req.assert("email", "Please enter a valid email address.").isEmail();
-  req.sanitize("email").normalizeEmail({ gmail_remove_dots: false });
+  req.assert("phone", "Please enter a valid phone number").isMobilePhone();
 
   const errors = req.validationErrors();
 
@@ -451,10 +446,10 @@ exports.postForgot = (req, res, next) => {
   );
 
   const setRandomToken = token =>
-    User.findOne({ email: req.body.email }).then(user => {
+    User.findOne({ phone: req.body.phone }).then(user => {
       if (!user) {
         req.flash("errors", {
-          msg: "Account with that email address does not exist."
+          msg: "Account with that phone address does not exist."
         });
       } else {
         user.passwordResetToken = token;
