@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const passport = require("passport");
 const User = require("../models/User");
-const getPhone = require("../config/get_phone");
+const getPhone = require("../config/strip_phone");
 const randomBytesAsync = promisify(crypto.randomBytes);
 
 exports.getUser = (req, res) => {
@@ -131,11 +131,8 @@ exports.postSignup = (req, res, next) => {
     return res.redirect("/signup");
   }
 
-  let match = getPhone(req.body.phone);
-  if (!match) {
-    return res.redirect("/signup");
-  }
-  req.body.phone = match[0];
+  let strippedPhone = getPhone(req.body.phone);
+  req.body.phone = strippedPhone;
   const user = new User.User(req.body);
 
   User.User.findOne({ phone: req.body.phone }, (err, existingUser) => {
