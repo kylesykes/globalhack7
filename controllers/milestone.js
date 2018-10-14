@@ -5,6 +5,6 @@ exports.getMilestones = (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.send({ milestones: milestones });
+    res.send(milestones);
   });
 };
