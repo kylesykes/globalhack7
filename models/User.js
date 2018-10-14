@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
 const Goal = require("./Goal");
+// const objectId = mongoose.Types.ObjectId;
 
 const userSchema = new mongoose.Schema(
   {
@@ -14,10 +15,10 @@ const userSchema = new mongoose.Schema(
       skills: [String]
     },
     hasMentor: { type: Boolean, default: false },
-    goals: [Goal.goalSchema],
+    goals: [],
     summaries: [String]
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 /**
