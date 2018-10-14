@@ -7,37 +7,14 @@ const getPhone = require("../config/strip_phone");
 const randomBytesAsync = promisify(crypto.randomBytes);
 
 exports.getUser = (req, res, next) => {
-  User.User.findOne({ phone: req.params.phone }, (err, existingUser) => {
+  User.User.findOne({ phone: req.params.phone }, (err, user) => {
     if (err) {
       return next(err);
     }
-    if (!existingUser) {
+    if (!user) {
       return res.status(404).send("Not found");
     }
-    let response;
-    if (User.isMentee(existingUser)) {
-      let mentor = existingUser.mentors[0];
-
-      User.User.findOne({ _id: mentor }, (err, mentor) => {
-        if (err) {
-          return next(err);
-        }
-        response = { user: existingUser, mentor: mentor };
-
-        res.send(response);
-      });
-    } else {
-      let mentee = existingUser.mentees[0];
-
-      User.User.findOne({ _id: mentee }, (err, mentee) => {
-        if (err) {
-          return next(err);
-        }
-        response = { user: existingUser, mentee: mentee };
-
-        res.send(response);
-      });
-    }
+    res.send(user);
   });
 };
 
