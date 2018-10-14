@@ -125,6 +125,39 @@ exports.completeGoal = (req, res, next) => {
   );
 };
 
+exports.completeMilestone = (req, res, next) => {
+  let userId = req.body.id;
+  let goalId = req.body.goalId;
+  let milestoneId = req.body.milestoneId;
+
+  User.User.findOne({ _id: userId }, (err, user) => {
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+    var goals = user.goals;
+    for (let i = 0; i < goals.length; i++) {
+      let goal = goals[i];
+      if (goal.g_id == goalId) {
+        for (let j = 0; j < goal.milestones.length; j++) {
+          let milestone = goal.milestones[j];
+          if (milestone._id == milestoneId) {
+            milestone.completed = true;
+            console.log("Here i am about to save");
+            return user.save(function(err, updatedUser) {
+              if (err) {
+                return next(err);
+              }
+              return res.send(updatedUser);
+            });
+          }
+        }
+      }
+    }
+    return res.status(404).send("Missing Goal or Milestone ID");
+  });
+};
+
 exports.assignGoal = (req, res, next) => {
   let userId = req.body.id;
   let goalId = req.body.goalId;
