@@ -8,3 +8,13 @@ exports.getMilestones = (req, res, next) => {
     res.send(milestones);
   });
 };
+
+exports.getMilestone = (req,res,next)=>{
+	let milestoneId = req.params.milestoneId;
+	MilestoneTemplate.MilestoneTemplate.find({ms_id:milestoneId}, (err, milestones) => {
+    if (err) {
+      return next(err);
+    }
+    res.send(milestones);
+  });
+}
