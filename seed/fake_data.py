@@ -235,6 +235,7 @@ def generate_milestone(milestone):
     ms = milestones_list[milestone]
     r = {
          'muid': generate_id(),
+         'ms_id': ms['ms_id'],
          'description': ms['description'],
          'name': ms['name'],
          'steps': generate_steps(milestone=milestone),
