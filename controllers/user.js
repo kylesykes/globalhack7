@@ -5,6 +5,7 @@ const passport = require("passport");
 const User = require("../models/User");
 const getPhone = require("../config/strip_phone");
 const randomBytesAsync = promisify(crypto.randomBytes);
+const Goal = require("../models/Goal");
 
 exports.getUser = (req, res, next) => {
   User.User.findOne({ phone: req.params.phone }, (err, user) => {
@@ -104,7 +105,7 @@ exports.postSignup = (req, res, next) => {
 
 exports.assignMilestone = (req, res) => {
   let userId = req.body.id;
-  let milestoneTemplateId = req.body.id;
+  let milestoneTemplateId = req.body.milestoneId;
 
   User.User.findById(userId, (err, user) => {
     if (err) {
@@ -123,10 +124,43 @@ exports.assignMilestone = (req, res) => {
           return res.status(404).send("MilestoneTemplateNotFound");
         }
         user.milestones.push(milestoneTemplate);
-        user.save();
-        res.send({});
+        user.save((err, updatedUser) => {
+          if (err) {
+            return next(err);
+          }
+          res.send(updatedUser);
+        });
       }
     );
+  });
+};
+
+exports.assignGoal = (req, res) => {
+  let userId = req.body.id;
+  let goalId = req.body.goalId;
+
+  User.User.findById(userId, (err, user) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    Goal.GoalTemplate.findOne({ g_id: goalId }, (err, goalTemplate) => {
+      if (err) {
+        return next(err);
+      }
+      if (!goalTemplate) {
+        return res.status(404).send("GoalTemplateNotFound");
+      }
+      user.goals.push(goalTemplate);
+      user.save((err, updatedUser) => {
+        if (err) {
+          return next(err);
+        }
+        res.send(updatedUser);
+      });
+    });
   });
 };
 
