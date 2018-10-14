@@ -156,46 +156,46 @@ goals_list = {'start_business': {'g_id': '1',
               'public_trans': {'g_id': '5',
                             'name': 'Use public transportation',
                             'description': 'Use public transportation.',
-                            'milestones': [],
+                            'milestones': ['7'],
                             'tags': ['Transportation']
                             },
               'buy_car': {'g_id': '6',
                             'name': 'Buy a car',
                             'description': 'Shop for and buy a car.',
-                            'milestones': [],
+                            'milestones': ['7'],
                             'tags': ['Transportation']
                             },
               'find_doctor': {'g_id': '7',
                             'name': 'Find a doctor',
                             'description': 'Search for and make an appointment with doctor.',
-                            'milestones': [],
+                            'milestones': ['7'],
                             'tags': ['Healthcare']
                             },
               'find_ped': {'g_id': '8',
                             'name': 'Find a pediatrician',
                             'description': 'Search for and make an appointment with pediatrician.',
-                            'milestones': [],
+                            'milestones': ['7'],
                             'tags': ['Healthcare']
                             },
               'medicare_medicaid': {'g_id': '9',
                             'name': 'Apply for medicare/medicaid',
                             'description': 'Understand and apply for medicare/medicaid.',
-                            'milestones': [],
+                            'milestones': ['7'],
                             'tags': ['Healthcare']
                             },
               'medical_bills': {'g_id': '10',
                             'name': 'Pay medical bills',
                             'description': 'Understand and pay medical bills.',
-                            'milestones': [],
+                            'milestones': ['7'],
                             'tags': ['Healthcare']
                             }
 
              }
 
 
-def generate_step(name, desc, in_progress=False, complete=False):
+def generate_step(name, desc, in_progress=False, completed=False):
     return {
-             'complete': complete,
+             'completed': completed,
              'description': desc,
              'in_progress': in_progress,
              'name': name}
@@ -215,31 +215,34 @@ def generate_steps(milestone, n_steps=3):
             steps_list.append(generate_step(name=cur[0],
                                             desc=cur[1],
                                             in_progress=False,
-                                            complete=True))
+                                            completed=True))
         elif i + 1 == cur_step:
             # Current step
             steps_list.append(generate_step(name=cur[0],
                                             desc=cur[1],
                                             in_progress=True,
-                                            complete=False))
+                                            completed=False))
         else:
             # Future step
             steps_list.append(generate_step(name=cur[0],
                                             desc=cur[1],
                                             in_progress=False,
-                                            complete=False))
+                                            completed=False))
     return steps_list
 
 
 def generate_milestone(milestone):
     ms = milestones_list[milestone]
     r = {
+         'muid': generate_id(),
          'description': ms['description'],
          'name': ms['name'],
          'steps': generate_steps(milestone=milestone),
          'in_progress': False,
          'completed': False,
-         'chats': []
+         'chat': {'isResolved': False,
+                   'messages': []
+                  }
      }
     return r
 
