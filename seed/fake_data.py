@@ -27,7 +27,7 @@ def generate_skills(n=3):
 
 
 def generate_lang():
-    return random.choice(['Spanish', 'English'])
+    return random.choice(['Spanish', 'English', 'Bosnian'])
 
 
 def generate_un():
@@ -119,13 +119,14 @@ milestones_list = {'drivers_license':
                                ('Step Four', 'The Fourth Step')]
                     },
                 'apply_for_cc':
-                    {'description': '.',
+                    {'description': 'Apply for and obtain a credit card.',
                      'name': 'Obtain credit card',
                      'ms_id': '11',
                      'steps': [('Step One', 'The First Step'),
                                ('Step Two', 'The Second Step')]
                     }
                 }
+
 
 
 goals_list = {'start_business': {'g_id': '1',
@@ -163,6 +164,30 @@ goals_list = {'start_business': {'g_id': '1',
                             'description': 'Shop for and buy a car.',
                             'milestones': [],
                             'tags': ['Transportation']
+                            },
+              'find_doctor': {'g_id': '7',
+                            'name': 'Find a doctor',
+                            'description': 'Search for and make an appointment with doctor.',
+                            'milestones': [],
+                            'tags': ['Healthcare']
+                            },
+              'find_ped': {'g_id': '8',
+                            'name': 'Find a pediatrician',
+                            'description': 'Search for and make an appointment with pediatrician.',
+                            'milestones': [],
+                            'tags': ['Healthcare']
+                            },
+              'medicare_medicaid': {'g_id': '9',
+                            'name': 'Apply for medicare/medicaid',
+                            'description': 'Understand and apply for medicare/medicaid.',
+                            'milestones': [],
+                            'tags': ['Healthcare']
+                            },
+              'medical_bills': {'g_id': '10',
+                            'name': 'Pay medical bills',
+                            'description': 'Understand and pay medical bills.',
+                            'milestones': [],
+                            'tags': ['Healthcare']
                             }
 
              }
@@ -239,7 +264,7 @@ def generate_goal(goal):
     return g
 
 
-def generate_goals(n=None, max_n=2):
+def generate_goals(n=None, max_n=3):
     if n is None:
         n = random.randint(0, max_n)
     return [generate_goal(g) for g in random.choices(list(goals_list.keys()), k=n)]  
