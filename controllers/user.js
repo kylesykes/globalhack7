@@ -254,10 +254,12 @@ exports.createMessage = (req, res, next) => {
 };
 
 exports.assignGoal = (req, res, next) => {
-  let userId = req.body.id;
+  console.log(req.body);
+
+  let phone = req.body.phone;
   let goalId = req.body.goalId;
 
-  User.User.findById(userId, (err, user) => {
+  User.User.findOne({phone}, (err, user) => {
     if (err) {
       return next(err);
     }
