@@ -10,7 +10,7 @@ const goalSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const GoalTemplate = mongoose.model("GoalTemplate", goalSchema);
+const GoalTemplate = mongoose.model("goals_with_milestones", goalSchema);
 
 module.exports.goalSchema = goalSchema;
 module.exports.GoalTemplate = GoalTemplate;
