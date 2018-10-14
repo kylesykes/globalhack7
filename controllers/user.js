@@ -1,43 +1,23 @@
 const { promisify } = require("util");
+const mongoose = require("mongoose");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const passport = require("passport");
 const User = require("../models/User");
 const getPhone = require("../config/strip_phone");
 const randomBytesAsync = promisify(crypto.randomBytes);
+const Goal = require("../models/Goal");
+const async = require("async");
 
 exports.getUser = (req, res, next) => {
-  User.User.findOne({ phone: req.params.phone }, (err, existingUser) => {
+  User.User.findOne({ phone: req.params.phone }, (err, user) => {
     if (err) {
       return next(err);
     }
-    if (!existingUser) {
+    if (!user) {
       return res.status(404).send("Not found");
     }
-    let response;
-    if (User.isMentee(existingUser)) {
-      let mentor = existingUser.mentors[0];
-
-      User.User.findOne({ _id: mentor }, (err, mentor) => {
-        if (err) {
-          return next(err);
-        }
-        response = { user: existingUser, mentor: mentor };
-
-        res.send(response);
-      });
-    } else {
-      let mentee = existingUser.mentees[0];
-
-      User.User.findOne({ _id: mentee }, (err, mentee) => {
-        if (err) {
-          return next(err);
-        }
-        response = { user: existingUser, mentee: mentee };
-
-        res.send(response);
-      });
-    }
+    res.send(user);
   });
 };
 
@@ -125,31 +105,182 @@ exports.postSignup = (req, res, next) => {
   });
 };
 
-exports.assignMilestone = (req, res) => {
+exports.completeGoal = (req, res, next) => {
   let userId = req.body.id;
-  let milestoneTemplateId = req.body.id;
+  let goalId = req.body.goalId;
 
-  User.User.findById(userId, (err, user) => {
+  User.User.findOneAndUpdate(
+    { _id: userId, "goals.g_id": goalId },
+    {
+      $set: {
+        "goals.$.completed": true
+      }
+    },
+    (err, user) => {
+      if (err) {
+        console.error(err);
+        return next(err);
+      }
+      res.send(user);
+    }
+  );
+};
+
+exports.completeMilestone = (req, res, next) => {
+  let userId = req.body.id;
+  let goalId = req.body.goalId;
+  let milestoneId = req.body.milestoneId;
+
+  User.User.findOne({ _id: userId }, (err, user) => {
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+
+    var foundMilestone;
+    async.each(
+      user.goals,
+      function(goal, cb) {
+        if (goal.g_id !== goalId) {
+          cb();
+        } else {
+          async.each(
+            goal.milestones,
+            function(milestone, callback) {
+              if (milestone.muid == milestoneId) {
+                foundMilestone = milestone;
+              }
+              callback();
+            },
+            function(err) {
+              if (err) {
+                return cb(err);
+              }
+              return cb();
+            }
+          );
+        }
+      },
+      function(err) {
+        if (err) {
+          return next(err);
+        }
+        if (!foundMilestone) {
+          return res
+            .status(404)
+            .send("An error occurred finding milestone or goal");
+        }
+        foundMilestone.completed = true;
+
+        return user.save(function(err, updatedUser) {
+          if (err) {
+            return next(err);
+          }
+          return res.send(updatedUser);
+        });
+      }
+    );
+  });
+};
+
+exports.createMessage = (req, res, next) => {
+  let userId = req.body.id;
+  let goalId = req.body.goalId;
+  let milestoneId = req.body.milestoneId;
+  let isResolved = req.body.isResolved;
+  let message = req.body.message;
+  let isSupport = req.body.isSupport;
+
+  User.User.findOne({ _id: userId }, (err, user) => {
+    if (err) {
+      console.error(err);
+      return next(err);
+    }
+
+    var foundMilestone;
+    async.each(
+      user.goals,
+      function(goal, cb) {
+        if (goal.g_id !== goalId) {
+          cb();
+        } else {
+          async.each(
+            goal.milestones,
+            function(milestone, callback) {
+              if (milestone.muid == milestoneId) {
+                foundMilestone = milestone;
+              }
+              callback();
+            },
+            function(err) {
+              if (err) {
+                return cb(err);
+              }
+              return cb();
+            }
+          );
+        }
+      },
+      function(err) {
+        if (err) {
+          return next(err);
+        }
+        if (!foundMilestone) {
+          return res
+            .status(404)
+            .send("An error occurred finding milestone or goal");
+        }
+        if (!foundMilestone.chat) {
+          return res
+            .status(404)
+            .send("An error occurred accessing foundMilestone Chat");
+        }
+        foundMilestone.chat.messages.push({
+          message: message,
+          isSupport: isSupport
+        });
+        if (isResolved) {
+          foundMilestone.chat.isResolved = true;
+        }
+        return user.save(function(err, updatedUser) {
+          if (err) {
+            return next(err);
+          }
+          return res.send(updatedUser);
+        });
+      }
+    );
+  });
+};
+
+exports.assignGoal = (req, res, next) => {
+  console.log(req.body);
+
+  let phone = req.body.phone;
+  let goalId = req.body.goalId;
+
+  User.User.findOne({phone}, (err, user) => {
     if (err) {
       return next(err);
     }
     if (!user) {
       return res.status(404).send("User not found");
     }
-    MilestoneTemplate.findById(
-      milestoneTemplateId,
-      (err, milestoneTemplate) => {
+    Goal.GoalTemplate.findOne({ g_id: goalId }, (err, goalTemplate) => {
+      if (err) {
+        return next(err);
+      }
+      if (!goalTemplate) {
+        return res.status(404).send("GoalTemplateNotFound");
+      }
+      user.goals.push(goalTemplate);
+      user.save((err, updatedUser) => {
         if (err) {
           return next(err);
         }
-        if (!milestoneTemplate) {
-          return res.status(404).send("MilestoneTemplateNotFound");
-        }
-        user.milestones.push(milestoneTemplate);
-        user.save();
-        res.send({});
-      }
-    );
+        res.send(updatedUser);
+      });
+    });
   });
 };
 
