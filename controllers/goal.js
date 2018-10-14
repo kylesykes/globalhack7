@@ -5,7 +5,7 @@ exports.getGoals = (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.send({ goals: goals });
+    res.send(goals);
   });
 };
 
@@ -16,6 +16,6 @@ exports.getGoal = (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.send({ goal: goal });
+    res.send(goal);
   });
 };
