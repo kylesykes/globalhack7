@@ -155,12 +155,13 @@ app.use(
 /**
  * Primary app routes.
  */
-app.get("/api/users/:phone", userController.getUser);
 app.post("/api/login", userController.postLogin);
 app.post("/api/signup", userController.postSignup);
 app.get("/api/milestones", milestoneController.getMilestones);
 app.get("/api/goals", goalController.getGoals);
 app.get("/api/goals/:goalId", goalController.getGoal);
+app.post("/api/users/assign", userController.assignGoal);
+app.get("/api/users/:phone", userController.getUser);
 // app.get("/api/milestones/:goalId", goalController.getMilestone);
 
 app.get("/login", userController.getLogin);
