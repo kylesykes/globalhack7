@@ -15,10 +15,10 @@ const userSchema = new mongoose.Schema(
       skills: [String]
     },
     hasMentor: { type: Boolean, default: false },
-    goals: [],
+    goals: [Goal.goalSchema],
     summaries: [String]
   },
-  { timestamps: true, versionKey: false }
+  { timestamps: true }
 );
 
 /**
