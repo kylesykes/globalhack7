@@ -1,21 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt-nodejs");
-
-const ObjectId = mongoose.Schema.Types.ObjectId;
-
-const milestoneSchema = new mongoose.Schema({
-  templateId: String,
-  name: String,
-  description: String,
-  steps: [
-    {
-      name: String,
-      description: String,
-      in_progress: Boolean,
-      complete: Boolean
-    }
-  ]
-});
+const Goal = require("./Goal");
 
 const userSchema = new mongoose.Schema(
   {
@@ -28,9 +13,8 @@ const userSchema = new mongoose.Schema(
       age: Number,
       skills: [String]
     },
-    mentors: [ObjectId],
-    mentees: [ObjectId],
-    milestones: [milestoneSchema]
+    hasMentor: { type: Boolean, default: false },
+    goals: [Goal.goalSchema]
   },
   { timestamps: true }
 );
@@ -72,6 +56,6 @@ userSchema.methods.comparePassword = function comparePassword(
 const User = mongoose.model("User", userSchema);
 
 module.exports.User = User;
-module.exports.isMentee = user => {
-  return user && user.mentors && user.mentors.length > 0;
+module.exports.hasMentor = user => {
+  return user.hasMentor;
 };

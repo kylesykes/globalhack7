@@ -1,22 +1,21 @@
 const mongoose = require("mongoose");
 
-const milestoneTemplateSchema = new mongoose.Schema(
+const milestoneSchema = new mongoose.Schema(
   {
     name: { type: String, unique: true },
     description: String,
     steps: [
       {
         name: String,
-        description: String
+        description: String,
+        complete: { type: Boolean, default: false },
+        in_progress: { type: Boolean, default: false }
       }
     ]
   },
   { timestamps: true }
 );
+const MilestoneTemplate = mongoose.model("MilestoneTemplate", milestoneSchema);
 
-const MilestoneTemplate = mongoose.model(
-  "MilestoneTemplate",
-  milestoneTemplateSchema
-);
-
-module.exports = MilestoneTemplate;
+module.exports.milestoneSchema = milestoneSchema;
+module.exports.MilestoneTemplate = MilestoneTemplate;
