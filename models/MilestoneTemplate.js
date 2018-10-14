@@ -17,6 +17,7 @@ const milestoneSchema = new mongoose.Schema(
     complete: { type: Boolean, default: false },
     in_progress: { type: Boolean, default: false },
     chat: chatSchema,
+    muid: String,
     steps: [
       {
         name: String,
