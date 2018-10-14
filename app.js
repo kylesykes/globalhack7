@@ -31,11 +31,11 @@ dotenv.load({ path: ".env.example" });
 /**
  * Controllers (route handlers).
  */
-const homeController = require("./controllers/home");
 const userController = require("./controllers/user");
 const apiController = require("./controllers/api");
 const contactController = require("./controllers/contact");
 const milestoneController = require("./controllers/milestone");
+const goalController = require("./controllers/goal");
 
 /**
  * API keys and Passport configuration.
@@ -159,8 +159,10 @@ app.get("/api/users/:phone", userController.getUser);
 app.post("/api/login", userController.postLogin);
 app.post("/api/signup", userController.postSignup);
 app.get("/api/milestones", milestoneController.getMilestones);
+app.get("/api/goals", goalController.getGoals);
+app.get("/api/goals/:goalId", goalController.getGoal);
+// app.get("/api/milestones/:goalId", goalController.getMilestone);
 
-app.get("/", homeController.index);
 app.get("/login", userController.getLogin);
 app.get("/logout", userController.logout);
 app.get("/forgot", userController.getForgot);
