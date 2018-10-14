@@ -1,4 +1,5 @@
 const MilestoneTemplate = require("../models/MilestoneTemplate");
+const Summary = require('../models/Summary');
 
 exports.getMilestones = (req, res, next) => {
   MilestoneTemplate.MilestoneTemplate.find({}, (err, milestones) => {
@@ -11,10 +12,20 @@ exports.getMilestones = (req, res, next) => {
 
 exports.getMilestone = (req,res,next)=>{
 	let milestoneId = req.params.milestoneId;
-	MilestoneTemplate.MilestoneTemplate.find({ms_id:milestoneId}, (err, milestones) => {
+	MilestoneTemplate.MilestoneTemplate.findOne({ms_id:milestoneId}, (err, milestone) => {
     if (err) {
       return next(err);
     }
-    res.send(milestones);
+		res.send(milestone);
   });
+}
+
+exports.getSummaries = (req,res,next)=>{
+	let milestoneId = req.params.milestoneId;
+	Summary.Summary.findOne({ms_id:milestoneId},(err,summaries) =>{
+			if(err) {
+				return next(err);
+			}
+			res.send(summaries.summaries);
+		})
 }

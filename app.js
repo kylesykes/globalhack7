@@ -159,6 +159,7 @@ app.post("/api/login", userController.postLogin);
 app.post("/api/signup", userController.postSignup);
 app.get("/api/milestones", milestoneController.getMilestones);
 app.get("/api/milestones/:milestoneId", milestoneController.getMilestone);
+app.get("/api/summaries/:milestoneId", milestoneController.getSummaries);
 app.get("/api/goals", goalController.getGoals);
 app.get("/api/goals/:goalId", goalController.getGoal);
 app.post("/api/users/assign", userController.assignGoal);
