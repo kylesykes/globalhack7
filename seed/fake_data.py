@@ -70,8 +70,8 @@ milestones_list = {'drivers_license':
                                ('Step Two', 'The Second Step')]
                     },
                 'find_a_store':
-                    {'description': 'Find a store',
-                     'name': 'Store',
+                    {'description': 'Find a store suitable to your desired business.',
+                     'name': 'Find a store',
                      'ms_id': '5',
                      'steps': [('Step One', 'The First Step'),
                                ('Step Two', 'The Second Step'),
@@ -79,12 +79,51 @@ milestones_list = {'drivers_license':
                                ('Step Four', 'The Fourth Step')]
                     },
                 'financial_basics':
-                    {'description': 'Learn about financial basics',
+                    {'description': 'Learn about financial basics.',
                      'name': 'Financial basics',
                      'ms_id': '6',
                      'steps': [('Step One', 'The First Step'),
                                ('Step Two', 'The Second Step'),
                                ('Step Three', 'The Third Step')]
+                    },
+                'government_id':
+                    {'description': 'Obtain a government ID.',
+                     'name': 'Goverment ID',
+                     'ms_id': '7',
+                     'steps': [('Step One', 'The First Step'),
+                               ('Step Two', 'The Second Step'),
+                               ('Step Three', 'The Third Step')]
+                    },
+                'job_posting':
+                    {'description': 'Review job posting.',
+                     'name': 'Job postings',
+                     'ms_id': '8',
+                     'steps': [('Step One', 'The First Step'),
+                               ('Step Two', 'The Second Step')]
+                    },
+                'apply_for_job':
+                    {'description': 'Apply to job postings.',
+                     'name': 'Apply for jobs',
+                     'ms_id': '9',
+                     'steps': [('Step One', 'The First Step'),
+                               ('Step Two', 'The Second Step'),
+                                ('Step Three', 'The Third Step')]
+                    },
+                'prepare_for_interview':
+                    {'description': 'Prepare for job interview.',
+                     'name': 'Prepare for interview',
+                     'ms_id': '10',
+                     'steps': [('Step One', 'The First Step'),
+                               ('Step Two', 'The Second Step'),
+                               ('Step Three', 'The Third Step'),
+                               ('Step Four', 'The Fourth Step')]
+                    },
+                'apply_for_cc':
+                    {'description': '.',
+                     'name': 'Obtain credit card',
+                     'ms_id': '11',
+                     'steps': [('Step One', 'The First Step'),
+                               ('Step Two', 'The Second Step')]
                     }
                 }
 
@@ -92,18 +131,45 @@ milestones_list = {'drivers_license':
 goals_list = {'start_business': {'g_id': '1',
                             'name': 'Start a business',
                             'description': 'Start a your own business.',
-                            'milestones': ['2', '3', '4', '5', '6']
+                            'milestones': ['2', '3', '4', '5', '6'],
+                            'tags': ['Financial']
                             },
-              'another_goal': {'g_id': '2',
-                            'name': 'Another goal.',
-                            'description': 'This is another goal',
-                            'milestones': ['1', '6']
+              'find_job': {'g_id': '2',
+                            'name': 'Find a job',
+                            'description': 'Find a job within your skillset.',
+                            'milestones': ['7', '8', '9', '10'],
+                            'tags': ['Financial']
+                            },
+              'banking_basics': {'g_id': '3',
+                            'name': 'Learn US banking basics',
+                            'description': 'Learn how to use the US banking system.',
+                            'milestones': ['6', '7', '2'],
+                            'tags': ['Financial']
+                            },
+              'built_credit': {'g_id': '4',
+                            'name': 'Build credit',
+                            'description': 'Build up your credit score.',
+                            'milestones': ['6', '11', '2'],
+                            'tags': ['Financial']
+                            },
+              'public_trans': {'g_id': '5',
+                            'name': 'Use public transportation',
+                            'description': 'Use public transportation.',
+                            'milestones': [],
+                            'tags': ['Transportation']
+                            },
+              'buy_car': {'g_id': '6',
+                            'name': 'Buy a car',
+                            'description': 'Shop for and buy a car.',
+                            'milestones': [],
+                            'tags': ['Transportation']
                             }
+
              }
 
 
 def generate_step(name, desc, in_progress=False, complete=False):
-    return {'_id': generate_id(),
+    return {
              'complete': complete,
              'description': desc,
              'in_progress': in_progress,
@@ -115,7 +181,6 @@ def generate_steps(milestone, n_steps=3):
     ms = milestones_list[milestone]
     steps = ms['steps']
     # Determine the current step.
-    #cur_step = random.randint(0, n_steps + 1)
     cur_step = random.randint(0, len(steps) + 1)
     steps_list = []
     for i in range(0, len(steps)):
@@ -143,8 +208,7 @@ def generate_steps(milestone, n_steps=3):
 
 def generate_milestone(milestone):
     ms = milestones_list[milestone]
-    #n_steps = random.randint(1, 4)
-    r = {'_id': generate_id(),
+    r = {
          'description': ms['description'],
          'name': ms['name'],
          'steps': generate_steps(milestone=milestone),
@@ -169,7 +233,6 @@ def get_milestone_by_id(_id):
 
 def generate_goal(goal):
     g = deepcopy(goals_list[goal])
-    g['_id'] = generate_id()
     g['milestones'] = [get_milestone_by_id(i) for i in g['milestones']]
     g['in_progress'] = False
     g['completed'] = False
@@ -178,7 +241,7 @@ def generate_goal(goal):
 
 def generate_goals(n=None, max_n=2):
     if n is None:
-        n = random.randint(1, max_n)
+        n = random.randint(0, max_n)
     return [generate_goal(g) for g in random.choices(list(goals_list.keys()), k=n)]  
 
 
@@ -189,11 +252,9 @@ def generate_goals_all():
 ### API
 
 def generate_user():
-    return {'__v': 3,
-         '_id': generate_id(),
+    return {
          'createdAt': generate_ts(),
          'hasMentor': random.choice([True, False]),
-         #'milestones': generate_milestones(),
          'goals': generate_goals(),
          'phone': generate_phone(),
          'profile': {'age': random.randint(18, 70),
@@ -208,7 +269,9 @@ def generate_user():
 
 def generate_users(num=10):
     data = [generate_user() for _ in range(int(num))]
+    # Fix phone number for one user
     data[0]['phone'] = '3141111111'
+    data[1]['goals'] = []
     return data
 
 
@@ -216,7 +279,6 @@ def get_goals():
     goals = []
     for g in goals_list.values():
         temp = dict(g)
-        temp['_id'] = generate_id()
         goals.append(temp)
     return goals
 
@@ -225,7 +287,6 @@ def get_milestones():
     ms = []
     for m in milestones_list.values():
         temp = dict(m)
-        temp['_id'] = generate_id()
         ms.append(temp)
     return ms
 
