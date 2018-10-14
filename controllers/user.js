@@ -1,4 +1,5 @@
 const { promisify } = require("util");
+const mongoose = require("mongoose");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const passport = require("passport");
@@ -103,39 +104,28 @@ exports.postSignup = (req, res, next) => {
   });
 };
 
-exports.assignMilestone = (req, res) => {
+exports.completeGoal = (req, res, next) => {
   let userId = req.body.id;
-  let milestoneTemplateId = req.body.milestoneId;
+  let goalId = req.body.goalId;
 
-  User.User.findById(userId, (err, user) => {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    MilestoneTemplate.findById(
-      milestoneTemplateId,
-      (err, milestoneTemplate) => {
-        if (err) {
-          return next(err);
-        }
-        if (!milestoneTemplate) {
-          return res.status(404).send("MilestoneTemplateNotFound");
-        }
-        user.milestones.push(milestoneTemplate);
-        user.save((err, updatedUser) => {
-          if (err) {
-            return next(err);
-          }
-          res.send(updatedUser);
-        });
+  User.User.findOneAndUpdate(
+    { _id: userId, "goals.g_id": goalId },
+    {
+      $set: {
+        "goals.$.completed": true
       }
-    );
-  });
+    },
+    (err, user) => {
+      if (err) {
+        console.error(err);
+        return next(err);
+      }
+      res.send(user);
+    }
+  );
 };
 
-exports.assignGoal = (req, res) => {
+exports.assignGoal = (req, res, next) => {
   let userId = req.body.id;
   let goalId = req.body.goalId;
 

@@ -4,12 +4,12 @@ const milestoneSchema = new mongoose.Schema(
   {
     name: { type: String, unique: true },
     description: String,
+    complete: { type: Boolean, default: false },
+    in_progress: { type: Boolean, default: false },
     steps: [
       {
         name: String,
-        description: String,
-        complete: { type: Boolean, default: false },
-        in_progress: { type: Boolean, default: false }
+        description: String
       }
     ]
   },
