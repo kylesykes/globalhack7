@@ -189,6 +189,7 @@ exports.createMessage = (req, res, next) => {
   let milestoneId = req.body.milestoneId;
   let isResolved = req.body.isResolved;
   let message = req.body.message;
+  let isSupport = req.body.isSupport;
 
   User.User.findOne({ _id: userId }, (err, user) => {
     if (err) {
@@ -234,7 +235,10 @@ exports.createMessage = (req, res, next) => {
             .status(404)
             .send("An error occurred accessing foundMilestone Chat");
         }
-        foundMilestone.chat.messages.push(message);
+        foundMilestone.chat.messages.push({
+          message: message,
+          isSupport: isSupport
+        });
         if (isResolved) {
           foundMilestone.chat.isResolved = true;
         }
