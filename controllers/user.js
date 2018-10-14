@@ -131,8 +131,6 @@ exports.completeMilestone = (req, res, next) => {
   let goalId = req.body.goalId;
   let milestoneId = req.body.milestoneId;
 
-  console.log(goalId, milestoneId, userId);
-
   User.User.findOne({ _id: userId }, (err, user) => {
     if (err) {
       console.error(err);
@@ -185,45 +183,77 @@ exports.completeMilestone = (req, res, next) => {
   });
 };
 
-exports.assignGoal = (req, res, next) => {
+exports.createMessage = (req, res, next) => {
   let userId = req.body.id;
   let goalId = req.body.goalId;
   let milestoneId = req.body.milestoneId;
   let isResolved = req.body.isResolved;
   let message = req.body.message;
+  let isSupport = req.body.isSupport;
 
   User.User.findOne({ _id: userId }, (err, user) => {
     if (err) {
       console.error(err);
       return next(err);
     }
-    var goals = user.goals;
-    for (let i = 0; i < goals.length; i++) {
-      let goal = goals[i];
-      if (goal.g_id == goalId) {
-        for (let j = 0; j < goal.milestones.length; j++) {
-          let milestone = goal.milestones[j];
-          if (milestone._id == milestoneId) {
-            if (isResolved) {
-              milestone.chat.isResolved = true;
-            }
 
-            milestone.chat.messages.push(message);
-            return user.save(function(err, updatedUser) {
-              if (err) {
-                return next(err);
+    var foundMilestone;
+    async.each(
+      user.goals,
+      function(goal, cb) {
+        if (goal.g_id !== goalId) {
+          cb();
+        } else {
+          async.each(
+            goal.milestones,
+            function(milestone, callback) {
+              if (milestone.muid == milestoneId) {
+                foundMilestone = milestone;
               }
-              return res.send(updatedUser);
-            });
-          }
+              callback();
+            },
+            function(err) {
+              if (err) {
+                return cb(err);
+              }
+              return cb();
+            }
+          );
         }
+      },
+      function(err) {
+        if (err) {
+          return next(err);
+        }
+        if (!foundMilestone) {
+          return res
+            .status(404)
+            .send("An error occurred finding milestone or goal");
+        }
+        if (!foundMilestone.chat) {
+          return res
+            .status(404)
+            .send("An error occurred accessing foundMilestone Chat");
+        }
+        foundMilestone.chat.messages.push({
+          message: message,
+          isSupport: isSupport
+        });
+        if (isResolved) {
+          foundMilestone.chat.isResolved = true;
+        }
+        return user.save(function(err, updatedUser) {
+          if (err) {
+            return next(err);
+          }
+          return res.send(updatedUser);
+        });
       }
-    }
-    return res.status(404).send("Missing Goal or Milestone ID");
+    );
   });
 };
 
-exports.createMessage = (req, res, next) => {
+exports.assignGoal = (req, res, next) => {
   let userId = req.body.id;
   let goalId = req.body.goalId;
 
