@@ -6,7 +6,8 @@ const goalSchema = new mongoose.Schema(
     name: { type: String, unique: true },
     description: String,
     milestones: [MilestoneTemplate.milestoneSchema],
-    complete: { type: Boolean, default: false }
+    completed: { type: Boolean, default: false },
+    g_id: String
   },
   { timestamps: true }
 );

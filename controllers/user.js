@@ -7,6 +7,7 @@ const User = require("../models/User");
 const getPhone = require("../config/strip_phone");
 const randomBytesAsync = promisify(crypto.randomBytes);
 const Goal = require("../models/Goal");
+const async = require("async");
 
 exports.getUser = (req, res, next) => {
   User.User.findOne({ phone: req.params.phone }, (err, user) => {
@@ -130,31 +131,57 @@ exports.completeMilestone = (req, res, next) => {
   let goalId = req.body.goalId;
   let milestoneId = req.body.milestoneId;
 
+  console.log(goalId, milestoneId, userId);
+
   User.User.findOne({ _id: userId }, (err, user) => {
     if (err) {
       console.error(err);
       return next(err);
     }
-    var goals = user.goals;
-    for (let i = 0; i < goals.length; i++) {
-      let goal = goals[i];
-      if (goal.g_id == goalId) {
-        for (let j = 0; j < goal.milestones.length; j++) {
-          let milestone = goal.milestones[j];
-          if (milestone._id == milestoneId) {
-            milestone.completed = true;
-            console.log("Here i am about to save");
-            return user.save(function(err, updatedUser) {
-              if (err) {
-                return next(err);
+
+    var foundMilestone;
+    async.each(
+      user.goals,
+      function(goal, cb) {
+        if (goal.g_id !== goalId) {
+          cb();
+        } else {
+          async.each(
+            goal.milestones,
+            function(milestone, callback) {
+              if (milestone.muid == milestoneId) {
+                foundMilestone = milestone;
               }
-              return res.send(updatedUser);
-            });
-          }
+              callback();
+            },
+            function(err) {
+              if (err) {
+                return cb(err);
+              }
+              return cb();
+            }
+          );
         }
+      },
+      function(err) {
+        if (err) {
+          return next(err);
+        }
+        if (!foundMilestone) {
+          return res
+            .status(404)
+            .send("An error occurred finding milestone or goal");
+        }
+        foundMilestone.completed = true;
+
+        return user.save(function(err, updatedUser) {
+          if (err) {
+            return next(err);
+          }
+          return res.send(updatedUser);
+        });
       }
-    }
-    return res.status(404).send("Missing Goal or Milestone ID");
+    );
   });
 };
 
