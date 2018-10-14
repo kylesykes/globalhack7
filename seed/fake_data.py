@@ -1,4 +1,5 @@
 import random
+from copy import deepcopy
 
 from bson.objectid import ObjectId
 import faker
@@ -18,7 +19,7 @@ def generate_id(n=24):
 
 
 def generate_phone():
-    return random.choice(['314', '636', '618', '217']) + str(fake.pydecimal(left_digits=7, right_digits=0, positive=True))[:7]
+    return random.choice(['314', '636', '618', '217']) + str(fake.pydecimal(left_digits=10, right_digits=0, positive=True))[:7]
 
 
 def generate_skills(n=3):
@@ -38,16 +39,15 @@ def generate_un():
 milestones_list = {'drivers_license':
                     {'description': 'To the DMV and get a drivers license',
                      'name': 'Driver\'s License',
-                     'ms_id': 1,
+                     'ms_id': '1',
                      'steps': [('Step One', 'The First Step'),
                                ('Step Two', 'The Second Step'),
-                               ('Step Three', 'The Third Step'),
-                               ('Step Four', 'The Fourth Step')]
+                               ('Step Three', 'The Third Step')]
                     },
                 'apply_for_loan':
                     {'description': 'Apply for a loan',
                      'name': 'Loan',
-                     'ms_id': 2,
+                     'ms_id': '2',
                      'steps': [('Step One', 'The First Step'),
                                ('Step Two', 'The Second Step'),
                                ('Step Three', 'The Third Step'),
@@ -56,7 +56,7 @@ milestones_list = {'drivers_license':
                 'get_license':
                     {'description': 'Get commerical license',
                      'name': 'Get license',
-                     'ms_id': 3,
+                     'ms_id': '3',
                      'steps': [('Step One', 'The First Step'),
                                ('Step Two', 'The Second Step'),
                                ('Step Three', 'The Third Step'),
@@ -65,16 +65,14 @@ milestones_list = {'drivers_license':
                 'apply_for_permit':
                     {'description': 'Apply for a permit',
                      'name': 'Permit',
-                     'ms_id': 4,
+                     'ms_id': '4',
                      'steps': [('Step One', 'The First Step'),
-                               ('Step Two', 'The Second Step'),
-                               ('Step Three', 'The Third Step'),
-                               ('Step Four', 'The Fourth Step')]
+                               ('Step Two', 'The Second Step')]
                     },
                 'find_a_store':
                     {'description': 'Find a store',
                      'name': 'Store',
-                     'ms_id': 5,
+                     'ms_id': '5',
                      'steps': [('Step One', 'The First Step'),
                                ('Step Two', 'The Second Step'),
                                ('Step Three', 'The Third Step'),
@@ -83,26 +81,25 @@ milestones_list = {'drivers_license':
                 'financial_basics':
                     {'description': 'Learn about financial basics',
                      'name': 'Financial basics',
-                     'ms_id': 6,
+                     'ms_id': '6',
                      'steps': [('Step One', 'The First Step'),
                                ('Step Two', 'The Second Step'),
-                               ('Step Three', 'The Third Step'),
-                               ('Step Four', 'The Fourth Step')]
+                               ('Step Three', 'The Third Step')]
                     }
                 }
 
 
-goals_list = {'start_business': {'g_id': 1,
+goals_list = {'start_business': {'g_id': '1',
                             'name': 'Start a business',
                             'description': 'Start a your own business.',
-                            'milestones': [2, 3, 4, 5, 6]
+                            'milestones': ['2', '3', '4', '5', '6']
                             },
-         'another_goal': {'g_id': 2,
-                          'name': 'Another goal.',
-                          'description': 'This is another goal',
-                          'milestones': [1, 6]
-                          }
-        }
+              'another_goal': {'g_id': '2',
+                            'name': 'Another goal.',
+                            'description': 'This is another goal',
+                            'milestones': ['1', '6']
+                            }
+             }
 
 
 def generate_step(name, desc, in_progress=False, complete=False):
@@ -118,9 +115,10 @@ def generate_steps(milestone, n_steps=3):
     ms = milestones_list[milestone]
     steps = ms['steps']
     # Determine the current step.
-    cur_step = random.randint(0, n_steps + 1)
+    #cur_step = random.randint(0, n_steps + 1)
+    cur_step = random.randint(0, len(steps) + 1)
     steps_list = []
-    for i in range(0, n_steps):
+    for i in range(0, len(steps)):
         cur = steps[i]
         if i + 1 < cur_step:
             # Completed step
@@ -145,37 +143,73 @@ def generate_steps(milestone, n_steps=3):
 
 def generate_milestone(milestone):
     ms = milestones_list[milestone]
-    n_steps = random.randint(1, 4)
+    #n_steps = random.randint(1, 4)
     r = {'_id': generate_id(),
          'description': ms['description'],
          'name': ms['name'],
-         'steps': generate_steps(milestone=milestone, n_steps=n_steps)}
+         'steps': generate_steps(milestone=milestone),
+         'in_progress': False,
+         'completed': False,
+         'chats': []
+     }
     return r
 
 
-def generate_milestones(n=None, max_n=3, milestones=None):
+def generate_milestones(n=None, max_n=3):
     if n is None:
         n = random.randint(1, max_n)
     return [generate_milestone(ms) for ms in random.choices(list(milestones_list.keys()), k=n)]
 
 
+def get_milestone_by_id(_id):
+    for k, m in milestones_list.items():
+        if m['ms_id'] == _id:
+            return generate_milestone(k)
+
+
+def generate_goal(goal):
+    g = deepcopy(goals_list[goal])
+    g['_id'] = generate_id()
+    g['milestones'] = [get_milestone_by_id(i) for i in g['milestones']]
+    g['in_progress'] = False
+    g['completed'] = False
+    return g
+
+
+def generate_goals(n=None, max_n=2):
+    if n is None:
+        n = random.randint(1, max_n)
+    return [generate_goal(g) for g in random.choices(list(goals_list.keys()), k=n)]  
+
+
+def generate_goals_all():
+    return [generate_goal(g) for g in goals_list]
+
+
 ### API
 
 def generate_user():
-    return {'__v': 1,
+    return {'__v': 3,
          '_id': generate_id(),
          'createdAt': generate_ts(),
-         'mentees': [],
-         'mentors': [generate_id()],
-         'milestones': generate_milestones(),
+         'hasMentor': random.choice([True, False]),
+         #'milestones': generate_milestones(),
+         'goals': generate_goals(),
          'phone': generate_phone(),
          'profile': {'age': random.randint(18, 70),
-          'gender': str(random.randint(0,1)),
-          'language': generate_lang(),
-          'skills': generate_skills()},
+                     'gender': str(random.randint(0,1)),
+                     'language': generate_lang(),
+                     'skills': generate_skills()
+                    },
          'updatedAt': generate_ts(),
          'username': generate_un(),
          'password': 'password'}
+
+
+def generate_users(num=10):
+    data = [generate_user() for _ in range(int(num))]
+    data[0]['phone'] = '3141111111'
+    return data
 
 
 def get_goals():
@@ -194,7 +228,7 @@ def get_milestones():
         temp['_id'] = generate_id()
         ms.append(temp)
     return ms
-    
+
 
 ### Main
 
@@ -202,6 +236,7 @@ if __name__=='__main__':
     import sys
     import json
     num = sys.argv[1]
-    data = [generate_user() for _ in range(int(num))]
-    data[0]['phone'] = '3141111111'
+    #data = [generate_user() for _ in range(int(num))]
+    #data[0]['phone'] = '3141111111'
+    data = generate_users(num)
     json.dump(data, open('users.json', 'w'))
