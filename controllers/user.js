@@ -136,11 +136,9 @@ exports.assignMilestone = (req, res) => {
 };
 
 exports.assignGoal = (req, res) => {
-  console.log("Assigning GOal");
   let userId = req.body.id;
   let goalId = req.body.goalId;
 
-  console.log(userId, goalId);
   User.User.findById(userId, (err, user) => {
     if (err) {
       return next(err);
