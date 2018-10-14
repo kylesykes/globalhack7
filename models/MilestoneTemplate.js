@@ -1,8 +1,13 @@
 const mongoose = require("mongoose");
 
+const messageSchema = new mongoose.Schema({
+  message: String,
+  isSupport: { type: Boolean, default: false }
+});
+
 const chatSchema = new mongoose.Schema({
   isResolved: { type: Boolean, default: false },
-  messages: [String]
+  messages: [messageSchema]
 });
 
 const milestoneSchema = new mongoose.Schema(
