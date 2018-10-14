@@ -27,7 +27,7 @@ const milestoneSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-const MilestoneTemplate = mongoose.model("MilestoneTemplate", milestoneSchema);
+const MilestoneTemplate = mongoose.model("milestones", milestoneSchema);
 
 module.exports.milestoneSchema = milestoneSchema;
 module.exports.MilestoneTemplate = MilestoneTemplate;
