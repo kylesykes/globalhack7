@@ -164,6 +164,7 @@ app.post("/api/users/assign", userController.assignGoal);
 app.get("/api/users/:phone", userController.getUser);
 app.post("/api/goals/complete", userController.completeGoal);
 app.post("/api/milestones/complete", userController.completeMilestone);
+app.post("/api/messages", userController.createMessage);
 
 app.get("/login", userController.getLogin);
 app.get("/logout", userController.logout);
