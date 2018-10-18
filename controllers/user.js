@@ -10,12 +10,17 @@ const Goal = require("../models/Goal");
 const async = require("async");
 
 exports.getUser = (req, res, next) => {
+  console.log('get uer hit');
+  console.log('with phone: ', req.params.phone);
   User.User.findOne({ phone: req.params.phone }, (err, user) => {
     if (err) {
       return next(err);
     }
     if (!user) {
       return res.status(404).send("Not found");
+    }
+    if(user.password) {
+      delete user.password
     }
     res.send(user);
   });
@@ -32,8 +37,7 @@ exports.postLogin = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    req.flash("errors", errors);
-    return res.redirect("/login");
+    return res.status(422).send("Login failed due to an error: ", errors);
   }
 
   passport.authenticate("local", (err, user, info) => {
@@ -42,15 +46,13 @@ exports.postLogin = (req, res, next) => {
       return next(err);
     }
     if (!user) {
-      req.flash("errors", info);
-      return res.redirect("/login");
+      return res.status(403).send("Login failed. Invalid credentials");
     }
     if (user.password)
       req.logIn(user, err => {
         if (err) {
           return next(err);
         }
-
         delete user.password;
         res.send(user);
       });
@@ -71,8 +73,7 @@ exports.postSignup = (req, res, next) => {
   const errors = req.validationErrors();
 
   if (errors) {
-    req.flash("errors", errors);
-    return res.redirect("/signup");
+    res.status(422).send("Unable to sign you up: ", errors);
   }
 
   let strippedPhone = getPhone(req.body.phone);
