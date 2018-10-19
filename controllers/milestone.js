@@ -27,7 +27,7 @@ exports.getSummaries = (req,res,next)=>{
 				return next(err);
 			}
       if(!summaries) {
-        return req.status(404).send(`no summaries found for milestone: ${milestoneId}`)
+        return res.status(404).send(`no summaries found for milestone: ${milestoneId}`)
       }
 			res.send(summaries.summaries);
 		})
